@@ -45,7 +45,7 @@ This is a simple console-based Tic-Tac-Toe game implemented in C++. The game all
 
 ```
 Enter name for Player 1: Alice
-Enter name for Player 2: Bob
+Enter name for Player 2 : Bob
 
 Player: Alice (X)
 Player: Bob (O)
