@@ -9,25 +9,29 @@ private:
     string name; // Name of the player
 
 public:
-    // Constructor
-    Player(const string &playerName, char playerSymbol) : name(playerName), symbol(playerSymbol) {}
-
+    // constructor
+    Player(char playerSymbol)
+    {
+        cout << "Enter the name for player " << playerSymbol << ": ";
+        getline(cin, this->name);
+        this->symbol = playerSymbol;
+    }
     // Function to get the player's symbol
     char getSymbol() const
     {
-        return symbol;
+        return this->symbol;
     }
 
     // Function to get the player's name
     string getName() const
     {
-        return name;
+        return this->name;
     }
 
     // Function to display player's details
     void display() const
     {
-        cout << "Player: " << name << " (" << symbol << ")\n";
+        cout << "Player: " << this->name << " (" << this->symbol << ")\n";
     }
 };
 
@@ -45,7 +49,7 @@ public:
         {
             for (int j = 0; j < 3; j++)
             {
-                board[i][j] = ' ';
+                this->board[i][j] = ' ';
             }
         }
     }
@@ -59,7 +63,7 @@ public:
             cout << i << " ";
             for (int j = 0; j < 3; j++)
             {
-                cout << board[i][j];
+                cout << this->board[i][j];
                 if (j < 2)
                     cout << "|";
             }
@@ -72,9 +76,9 @@ public:
     // Function to place a move on the board
     bool makeMove(int row, int col, char player)
     {
-        if (row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == ' ')
+        if (row >= 0 && row < 3 && col >= 0 && col < 3 && this->board[row][col] == ' ')
         {
-            board[row][col] = player;
+            this->board[row][col] = player;
             return true;
         }
         return false;
@@ -84,8 +88,8 @@ public:
 int main()
 {
     // Instantiate Player objects
-    Player player1("Alice", 'X');
-    Player player2("Bob", 'O');
+    Player player1('X');
+    Player player2('O');
 
     // Instantiate Board object
     Board board;
