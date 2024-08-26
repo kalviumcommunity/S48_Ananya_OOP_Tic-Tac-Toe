@@ -9,13 +9,18 @@ private:
     string name; // Name of the player
 
 public:
-    // constructor
-    Player(char playerSymbol)
+    // Function to set the player's symbol
+    void setSymbol(char playerSymbol)
     {
-        cout << "Enter the name for player " << playerSymbol << ": ";
-        getline(cin, this->name);
         this->symbol = playerSymbol;
     }
+
+    // Function to set the player's name
+    void setName(string playerName)
+    {
+        this->name = playerName;
+    }
+
     // Function to get the player's symbol
     char getSymbol() const
     {
@@ -42,8 +47,8 @@ private:
     char board[3][3]; // 3x3 board
 
 public:
-    // Constructor to initialize the board with empty spaces
-    Board()
+    // Function to initialize the board with empty spaces
+    void initializeBoard()
     {
         for (int i = 0; i < 3; i++)
         {
@@ -87,20 +92,34 @@ public:
 
 int main()
 {
-    // Instantiate Player objects
-    Player player1('X');
-    Player player2('O');
+    // Array of Player objects
+    Player players[2];
 
-    // Instantiate Board object
+    // Set player details
+    cout << "Enter the name for player X: ";
+    string name;
+    getline(cin, name);
+    players[0].setName(name);
+    players[0].setSymbol('X');
+
+    cout << "Enter the name for player O: ";
+    getline(cin, name);
+    players[1].setName(name);
+    players[1].setSymbol('O');
+
+    // Initialize Board object
     Board board;
+    board.initializeBoard();
 
     // Example usage
     board.displayBoard();
-    player1.display();
-    player2.display();
+    for (int i = 0; i < 2; i++)
+    {
+        players[i].display();
+    }
 
     // Making a move
-    board.makeMove(0, 0, player1.getSymbol());
+    board.makeMove(0, 0, players[0].getSymbol());
     board.displayBoard();
 
     return 0;
