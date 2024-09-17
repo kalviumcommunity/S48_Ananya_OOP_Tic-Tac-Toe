@@ -92,8 +92,8 @@ public:
 
 int main()
 {
-    // Array of Player objects
-    Player players[2];
+    // Dynamically allocate an array of 2 Player objects
+    Player *players = new Player[2]; // using new[] for array
 
     // Set player details
     cout << "Enter the name for player X: ";
@@ -107,20 +107,24 @@ int main()
     players[1].setName(name);
     players[1].setSymbol('O');
 
-    // Initialize Board object
-    Board board;
-    board.initializeBoard();
+    // Dynamically allocate the Board object
+    Board *board = new Board; // using new for single object
+    board->initializeBoard();
 
     // Example usage
-    board.displayBoard();
+    board->displayBoard();
     for (int i = 0; i < 2; i++)
     {
         players[i].display();
     }
 
     // Making a move
-    board.makeMove(0, 0, players[0].getSymbol());
-    board.displayBoard();
+    board->makeMove(0, 0, players[0].getSymbol());
+    board->displayBoard();
+
+    // Deallocate dynamically allocated memory
+    delete[] players; // using delete[] for array
+    delete board;     // using delete for single object
 
     return 0;
 }
