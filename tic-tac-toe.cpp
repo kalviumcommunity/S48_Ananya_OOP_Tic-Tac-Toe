@@ -5,10 +5,16 @@ using namespace std;
 class Player
 {
 private:
-    char symbol; // Symbol for the player ('X' or 'O')
-    string name; // Name of the player
+    char symbol;            // Symbol for the player ('X' or 'O')
+    string name;            // Name of the player
+    static int playerCount; // Static variable to keep track of the number of Player objects created
 
 public:
+    // Constructor to increase playerCount when a new Player is created
+    Player()
+    {
+        playerCount++;
+    }
     // Function to set the player's symbol
     void setSymbol(char playerSymbol)
     {
@@ -32,6 +38,11 @@ public:
     {
         return this->name;
     }
+    // Static function to get the current number of players
+    static int getPlayerCount()
+    {
+        return playerCount;
+    }
 
     // Function to display player's details
     void display() const
@@ -39,6 +50,8 @@ public:
         cout << "Player: " << this->name << " (" << this->symbol << ")\n";
     }
 };
+// Initialize the static member variable
+int Player::playerCount = 0;
 
 // Class to represent the Tic-Tac-Toe board
 class Board
@@ -110,6 +123,9 @@ int main()
     // Dynamically allocate the Board object
     Board *board = new Board; // using new for single object
     board->initializeBoard();
+
+    // Display number of players
+    cout << "Number of players: " << Player::getPlayerCount() << endl;
 
     // Example usage
     board->displayBoard();
