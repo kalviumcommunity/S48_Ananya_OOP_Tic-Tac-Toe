@@ -1,1 +1,1 @@
-this->board[i][j] =
+players
