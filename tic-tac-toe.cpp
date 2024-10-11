@@ -1,66 +1,55 @@
 #include <iostream>
 using namespace std;
 
-// Class to represent a Player in the game
 class Player
 {
 private:
-    char symbol;            // Symbol for the player ('X' or 'O')
-    string name;            // Name of the player
-    static int playerCount; // Static variable to keep track of the number of Player objects created
+    char symbol;
+    string name;
+    static int playerCount;
 
 public:
-    // Constructor to increase playerCount when a new Player is created
     Player()
     {
         playerCount++;
     }
-    // Function to set the player's symbol
-    void setSymbol(char playerSymbol)
+
+    void setter(string playerName, char playerSymbol)
     {
+        this->name = playerName;
         this->symbol = playerSymbol;
     }
 
-    // Function to set the player's name
-    void setName(string playerName)
+    void getter() const
     {
-        this->name = playerName;
+        cout << "Player Name: " << this->name << endl;
+        cout << "Player Symbol: " << this->symbol << endl;
     }
 
-    // Function to get the player's symbol
     char getSymbol() const
     {
         return this->symbol;
     }
 
-    // Function to get the player's name
-    string getName() const
-    {
-        return this->name;
-    }
-    // Static function to get the current number of players
     static int getPlayerCount()
     {
         return playerCount;
     }
 
-    // Function to display player's details
     void display() const
     {
         cout << "Player: " << this->name << " (" << this->symbol << ")\n";
     }
 };
-// Initialize the static member variable
+
 int Player::playerCount = 0;
 
-// Class to represent the Tic-Tac-Toe board
 class Board
 {
 private:
-    char board[3][3]; // 3x3 board
+    char board[3][3];
 
 public:
-    // Function to initialize the board with empty spaces
     void initializeBoard()
     {
         for (int i = 0; i < 3; i++)
@@ -72,7 +61,6 @@ public:
         }
     }
 
-    // Function to display the board
     void displayBoard() const
     {
         cout << "  0 1 2\n";
@@ -91,7 +79,6 @@ public:
         }
     }
 
-    // Function to place a move on the board
     bool makeMove(int row, int col, char player)
     {
         if (row >= 0 && row < 3 && col >= 0 && col < 3 && this->board[row][col] == ' ')
@@ -105,42 +92,35 @@ public:
 
 int main()
 {
-    // Dynamically allocate an array of 2 Player objects
-    Player *players = new Player[2]; // using new[] for array
+    Player *players = new Player[2];
 
-    // Set player details
-    cout << "Enter the name for player X: ";
-    string name;
-    getline(cin, name);
-    players[0].setName(name);
-    players[0].setSymbol('X');
-
-    cout << "Enter the name for player O: ";
-    getline(cin, name);
-    players[1].setName(name);
-    players[1].setSymbol('O');
-
-    // Dynamically allocate the Board object
-    Board *board = new Board; // using new for single object
-    board->initializeBoard();
-
-    // Display number of players
-    cout << "Number of players: " << Player::getPlayerCount() << endl;
-
-    // Example usage
-    board->displayBoard();
+    char symbols[] = {'X', 'O'};
     for (int i = 0; i < 2; i++)
     {
-        players[i].display();
+        cout << "Enter the name for player " << symbols[i] << ": ";
+        string name;
+        getline(cin, name);
+        players[i].setter(name, symbols[i]);
     }
 
-    // Making a move
+    Board *board = new Board;
+    board->initializeBoard();
+
+    cout << "Number of players: " << Player::getPlayerCount() << endl;
+
+    board->displayBoard();
+
+    for (int i = 0; i < 2; i++)
+    {
+        cout << "Details of Player " << (i + 1) << ":" << endl;
+        players[i].getter();
+    }
+
     board->makeMove(0, 0, players[0].getSymbol());
     board->displayBoard();
 
-    // Deallocate dynamically allocated memory
-    delete[] players; // using delete[] for array
-    delete board;     // using delete for single object
+    delete[] players;
+    delete board;
 
     return 0;
 }
