@@ -20,10 +20,9 @@ public:
         this->symbol = playerSymbol;
     }
 
-    void getter() const
+    string getName() const
     {
-        cout << "Player Name: " << this->name << endl;
-        cout << "Player Symbol: " << this->symbol << endl;
+        return this->name;
     }
 
     char getSymbol() const
@@ -34,11 +33,6 @@ public:
     static int getPlayerCount()
     {
         return playerCount;
-    }
-
-    void display() const
-    {
-        cout << "Player: " << this->name << " (" << this->symbol << ")\n";
     }
 };
 
@@ -88,39 +82,114 @@ public:
         }
         return false;
     }
+
+    bool isFull() const
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                if (this->board[i][j] == ' ')
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    bool checkWin(char player) const
+    {
+        // Check rows
+        for (int i = 0; i < 3; i++)
+        {
+            if (board[i][0] == player && board[i][1] == player && board[i][2] == player)
+            {
+                return true;
+            }
+        }
+
+        // Check columns
+        for (int j = 0; j < 3; j++)
+        {
+            if (board[0][j] == player && board[1][j] == player && board[2][j] == player)
+            {
+                return true;
+            }
+        }
+
+        // Check diagonals
+        if (board[0][0] == player && board[1][1] == player && board[2][2] == player)
+        {
+            return true;
+        }
+        if (board[0][2] == player && board[1][1] == player && board[2][0] == player)
+        {
+            return true;
+        }
+
+        return false;
+    }
+};
+
+class Game
+{
+private:
+    Player players[2];
+    Board board;
+    int currentPlayer;
+
+public:
+    Game()
+    {
+        currentPlayer = 0;
+        char symbols[] = {'X', 'O'};
+        for (int i = 0; i < 2; i++)
+        {
+            cout << "Enter the name for player " << symbols[i] << ": ";
+            string name;
+            getline(cin, name);
+            players[i].setter(name, symbols[i]);
+        }
+        board.initializeBoard();
+    }
+
+    void play()
+    {
+        bool gameWon = false;
+        while (!board.isFull() && !gameWon)
+        {
+            board.displayBoard();
+            Player &player = players[currentPlayer];
+            cout << player.getName() << "'s turn (" << player.getSymbol() << ")\n";
+            int row, col;
+            cout << "Enter row and column: ";
+            cin >> row >> col;
+            if (board.makeMove(row, col, player.getSymbol()))
+            {
+                if (board.checkWin(player.getSymbol()))
+                {
+                    board.displayBoard();
+                    cout << "Congratulations! " << player.getName() << " wins the game!\n";
+                    gameWon = true;
+                }
+                currentPlayer = (currentPlayer + 1) % 2; // Switch players
+            }
+            else
+            {
+                cout << "Invalid move. Try again.\n";
+            }
+        }
+
+        if (!gameWon)
+        {
+            board.displayBoard();
+            cout << "It's a draw!\n";
+        }
+    }
 };
 
 int main()
 {
-    Player *players = new Player[2];
-
-    char symbols[] = {'X', 'O'};
-    for (int i = 0; i < 2; i++)
-    {
-        cout << "Enter the name for player " << symbols[i] << ": ";
-        string name;
-        getline(cin, name);
-        players[i].setter(name, symbols[i]);
-    }
-
-    Board *board = new Board;
-    board->initializeBoard();
-
-    cout << "Number of players: " << Player::getPlayerCount() << endl;
-
-    board->displayBoard();
-
-    for (int i = 0; i < 2; i++)
-    {
-        cout << "Details of Player " << (i + 1) << ":" << endl;
-        players[i].getter();
-    }
-
-    board->makeMove(0, 0, players[0].getSymbol());
-    board->displayBoard();
-
-    delete[] players;
-    delete board;
-
+    Game game;
+    game.play();
     return 0;
 }
