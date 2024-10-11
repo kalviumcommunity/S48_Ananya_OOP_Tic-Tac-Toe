@@ -14,6 +14,11 @@ public:
         playerCount++;
     }
 
+    ~Player()
+    {
+        playerCount--;
+    }
+
     void setter(string playerName, char playerSymbol)
     {
         this->name = playerName;
@@ -44,6 +49,15 @@ private:
     char board[3][3];
 
 public:
+    Board()
+    {
+        initializeBoard();
+    }
+
+    ~Board()
+    {
+    }
+
     void initializeBoard()
     {
         for (int i = 0; i < 3; i++)
@@ -98,7 +112,6 @@ public:
 
     bool checkWin(char player) const
     {
-        // Check rows
         for (int i = 0; i < 3; i++)
         {
             if (board[i][0] == player && board[i][1] == player && board[i][2] == player)
@@ -107,7 +120,6 @@ public:
             }
         }
 
-        // Check columns
         for (int j = 0; j < 3; j++)
         {
             if (board[0][j] == player && board[1][j] == player && board[2][j] == player)
@@ -116,7 +128,6 @@ public:
             }
         }
 
-        // Check diagonals
         if (board[0][0] == player && board[1][1] == player && board[2][2] == player)
         {
             return true;
@@ -152,6 +163,10 @@ public:
         board.initializeBoard();
     }
 
+    ~Game()
+    {
+    }
+
     void play()
     {
         bool gameWon = false;
@@ -171,7 +186,7 @@ public:
                     cout << "Congratulations! " << player.getName() << " wins the game!\n";
                     gameWon = true;
                 }
-                currentPlayer = (currentPlayer + 1) % 2; // Switch players
+                currentPlayer = (currentPlayer + 1) % 2;
             }
             else
             {
