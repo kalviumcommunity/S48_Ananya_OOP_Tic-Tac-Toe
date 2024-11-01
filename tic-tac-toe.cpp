@@ -107,6 +107,7 @@ public:
         }
     }
 
+    // Overloaded makeMove function (Function Overloading)
     bool makeMove(int row, int col, char playerSymbol)
     {
         if (row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == ' ')
@@ -115,6 +116,14 @@ public:
             return true;
         }
         return false;
+    }
+
+    // Another makeMove function that accepts a single integer position
+    bool makeMove(int position, char playerSymbol)
+    {
+        int row = position / 3;
+        int col = position % 3;
+        return makeMove(row, col, playerSymbol);
     }
 
     bool isFull() const
@@ -188,23 +197,48 @@ public:
             board.display();
             Player &player = players[currentPlayer];
             cout << player.getName() << "'s turn (" << player.getSymbol() << ")\n";
-            int row, col;
-            cout << "Enter row and column: ";
-            cin >> row >> col;
-
-            if (board.makeMove(row, col, player.getSymbol()))
+            int choice;
+            cout << "Enter 1 to input row and column or 2 to input single position (0-8): ";
+            cin >> choice;
+            int row, col, pos;
+            
+            if (choice == 1)
             {
-                if (board.checkWin(player.getSymbol()))
+                cout << "Enter row and column: ";
+                cin >> row >> col;
+                if (board.makeMove(row, col, player.getSymbol()))
                 {
-                    board.display();
-                    cout << "Congratulations! " << player.getName() << " wins the game!\n";
-                    gameWon = true;
+                    if (board.checkWin(player.getSymbol()))
+                    {
+                        board.display();
+                        cout << "Congratulations! " << player.getName() << " wins the game!\n";
+                        gameWon = true;
+                    }
+                    currentPlayer = (currentPlayer + 1) % 2;
                 }
-                currentPlayer = (currentPlayer + 1) % 2;
+                else
+                {
+                    cout << "Invalid move. Try again.\n";
+                }
             }
             else
             {
-                cout << "Invalid move. Try again.\n";
+                cout << "Enter position (0-8): ";
+                cin >> pos;
+                if (board.makeMove(pos, player.getSymbol()))
+                {
+                    if (board.checkWin(player.getSymbol()))
+                    {
+                        board.display();
+                        cout << "Congratulations! " << player.getName() << " wins the game!\n";
+                        gameWon = true;
+                    }
+                    currentPlayer = (currentPlayer + 1) % 2;
+                }
+                else
+                {
+                    cout << "Invalid move. Try again.\n";
+                }
             }
         }
 
