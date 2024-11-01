@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 
-// Base class Person
+// Abstract Base Class: Person
 class Person
 {
 protected:
@@ -10,6 +10,7 @@ protected:
 public:
     Person() : name("Unknown") {}
 
+    // Set and Get methods for 'name'
     void setName(const string &playerName)
     {
         name = playerName;
@@ -21,12 +22,12 @@ public:
     }
 };
 
-// Derived class Player inherits from Person (Single Inheritance)
+// Derived Class: Player inherits from Person (Single Inheritance)
 class Player : public Person
 {
 private:
     char symbol;
-    static int playerCount;
+    static int playerCount; // Keeps track of the number of players
 
 public:
     Player()
@@ -39,9 +40,10 @@ public:
         playerCount--;
     }
 
+    // Sets player's details with name and symbol
     void setPlayerDetails(const string &playerName, char playerSymbol)
     {
-        setName(playerName); // inherited from Person
+        setName(playerName); // Set the name using the Person base class function
         symbol = playerSymbol;
     }
 
@@ -50,6 +52,7 @@ public:
         return symbol;
     }
 
+    // Static function to get player count
     static int getPlayerCount()
     {
         return playerCount;
@@ -58,26 +61,29 @@ public:
 
 int Player::playerCount = 0;
 
-// Base class GameComponent for multilevel inheritance
+// Abstract Base Class: GameComponent for multilevel inheritance
 class GameComponent
 {
 public:
-    virtual void initialize() = 0;    // Pure virtual function for initialization
-    virtual void display() const = 0; // Pure virtual function for display
+    // Pure virtual functions - Making GameComponent an abstract class
+    virtual void initialize() = 0;    // For initialization
+    virtual void display() const = 0; // For displaying game components
 };
 
-// Derived class Board inherits from GameComponent (Multilevel Inheritance)
+// Derived Class: Board inherits from GameComponent (Multilevel Inheritance)
 class Board : public GameComponent
 {
 protected:
-    char board[3][3];
+    char board[3][3]; // 3x3 board array
 
 public:
+    // Constructor initializes the board
     Board()
     {
         initialize();
     }
 
+    // Initializes board with empty spaces
     void initialize() override
     {
         for (int i = 0; i < 3; i++)
@@ -89,6 +95,7 @@ public:
         }
     }
 
+    // Displays the Tic-Tac-Toe board
     void display() const override
     {
         cout << "  0 1 2\n";
@@ -107,7 +114,7 @@ public:
         }
     }
 
-    // Overloaded makeMove function (Function Overloading)
+    // Overloaded makeMove function: Allows move by row and column
     bool makeMove(int row, int col, char playerSymbol)
     {
         if (row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == ' ')
@@ -118,7 +125,7 @@ public:
         return false;
     }
 
-    // Another makeMove function that accepts a single integer position
+    // Overloaded makeMove function: Allows move by single position
     bool makeMove(int position, char playerSymbol)
     {
         int row = position / 3;
@@ -126,6 +133,7 @@ public:
         return makeMove(row, col, playerSymbol);
     }
 
+    // Checks if the board is full
     bool isFull() const
     {
         for (int i = 0; i < 3; i++)
@@ -140,10 +148,11 @@ public:
     }
 };
 
-// Derived class TicTacToeBoard inherits from Board (Extending Board for Tic-Tac-Toe specific rules)
+// Derived Class: TicTacToeBoard inherits from Board (Multilevel Inheritance)
 class TicTacToeBoard : public Board
 {
 public:
+    // Checks if a player has won
     bool checkWin(char playerSymbol) const
     {
         // Check rows and columns
@@ -167,7 +176,7 @@ public:
     }
 };
 
-// Game class to control the game flow
+// Game Class to control the game flow
 class Game
 {
 private:
@@ -178,6 +187,7 @@ private:
 public:
     Game() : currentPlayer(0)
     {
+        // Initialize player symbols
         char symbols[] = {'X', 'O'};
         for (int i = 0; i < 2; i++)
         {
@@ -186,9 +196,10 @@ public:
             getline(cin, name);
             players[i].setPlayerDetails(name, symbols[i]);
         }
-        board.initialize();
+        board.initialize(); // Initialize the board
     }
 
+    // Main game loop
     void play()
     {
         bool gameWon = false;
@@ -198,10 +209,11 @@ public:
             Player &player = players[currentPlayer];
             cout << player.getName() << "'s turn (" << player.getSymbol() << ")\n";
             int choice;
-            cout << "Enter 1 to input row and column or 2 to input single position (0-8): ";
+            cout << "Enter 1 for row and column or 2 for position (0-8): ";
             cin >> choice;
             int row, col, pos;
-            
+
+            // Choose input method for the move
             if (choice == 1)
             {
                 cout << "Enter row and column: ";
@@ -242,6 +254,7 @@ public:
             }
         }
 
+        // Check for draw if board is full
         if (!gameWon)
         {
             board.display();
