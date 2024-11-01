@@ -1,11 +1,31 @@
 #include <iostream>
 using namespace std;
 
-class Player
+// Base class Person
+class Person
+{
+protected:
+    string name;
+
+public:
+    Person() : name("Unknown") {}
+
+    void setName(const string &playerName)
+    {
+        name = playerName;
+    }
+
+    string getName() const
+    {
+        return name;
+    }
+};
+
+// Derived class Player inherits from Person (Single Inheritance)
+class Player : public Person
 {
 private:
     char symbol;
-    string name;
     static int playerCount;
 
 public:
@@ -19,20 +39,15 @@ public:
         playerCount--;
     }
 
-    void setter(string playerName, char playerSymbol)
+    void setPlayerDetails(const string &playerName, char playerSymbol)
     {
-        this->name = playerName;
-        this->symbol = playerSymbol;
-    }
-
-    string getName() const
-    {
-        return this->name;
+        setName(playerName); // inherited from Person
+        symbol = playerSymbol;
     }
 
     char getSymbol() const
     {
-        return this->symbol;
+        return symbol;
     }
 
     static int getPlayerCount()
@@ -43,33 +58,38 @@ public:
 
 int Player::playerCount = 0;
 
-class Board
+// Base class GameComponent for multilevel inheritance
+class GameComponent
 {
-private:
+public:
+    virtual void initialize() = 0;    // Pure virtual function for initialization
+    virtual void display() const = 0; // Pure virtual function for display
+};
+
+// Derived class Board inherits from GameComponent (Multilevel Inheritance)
+class Board : public GameComponent
+{
+protected:
     char board[3][3];
 
 public:
     Board()
     {
-        initializeBoard();
+        initialize();
     }
 
-    ~Board()
-    {
-    }
-
-    void initializeBoard()
+    void initialize() override
     {
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 3; j++)
             {
-                this->board[i][j] = ' ';
+                board[i][j] = ' ';
             }
         }
     }
 
-    void displayBoard() const
+    void display() const override
     {
         cout << "  0 1 2\n";
         for (int i = 0; i < 3; i++)
@@ -77,7 +97,7 @@ public:
             cout << i << " ";
             for (int j = 0; j < 3; j++)
             {
-                cout << this->board[i][j];
+                cout << board[i][j];
                 if (j < 2)
                     cout << "|";
             }
@@ -87,11 +107,11 @@ public:
         }
     }
 
-    bool makeMove(int row, int col, char player)
+    bool makeMove(int row, int col, char playerSymbol)
     {
-        if (row >= 0 && row < 3 && col >= 0 && col < 3 && this->board[row][col] == ' ')
+        if (row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == ' ')
         {
-            this->board[row][col] = player;
+            board[row][col] = playerSymbol;
             return true;
         }
         return false;
@@ -103,36 +123,33 @@ public:
         {
             for (int j = 0; j < 3; j++)
             {
-                if (this->board[i][j] == ' ')
+                if (board[i][j] == ' ')
                     return false;
             }
         }
         return true;
     }
+};
 
-    bool checkWin(char player) const
+// Derived class TicTacToeBoard inherits from Board (Extending Board for Tic-Tac-Toe specific rules)
+class TicTacToeBoard : public Board
+{
+public:
+    bool checkWin(char playerSymbol) const
     {
+        // Check rows and columns
         for (int i = 0; i < 3; i++)
         {
-            if (board[i][0] == player && board[i][1] == player && board[i][2] == player)
+            if ((board[i][0] == playerSymbol && board[i][1] == playerSymbol && board[i][2] == playerSymbol) ||
+                (board[0][i] == playerSymbol && board[1][i] == playerSymbol && board[2][i] == playerSymbol))
             {
                 return true;
             }
         }
 
-        for (int j = 0; j < 3; j++)
-        {
-            if (board[0][j] == player && board[1][j] == player && board[2][j] == player)
-            {
-                return true;
-            }
-        }
-
-        if (board[0][0] == player && board[1][1] == player && board[2][2] == player)
-        {
-            return true;
-        }
-        if (board[0][2] == player && board[1][1] == player && board[2][0] == player)
+        // Check diagonals
+        if ((board[0][0] == playerSymbol && board[1][1] == playerSymbol && board[2][2] == playerSymbol) ||
+            (board[0][2] == playerSymbol && board[1][1] == playerSymbol && board[2][0] == playerSymbol))
         {
             return true;
         }
@@ -141,30 +158,26 @@ public:
     }
 };
 
+// Game class to control the game flow
 class Game
 {
 private:
     Player players[2];
-    Board board;
+    TicTacToeBoard board;
     int currentPlayer;
 
 public:
-    Game()
+    Game() : currentPlayer(0)
     {
-        currentPlayer = 0;
         char symbols[] = {'X', 'O'};
         for (int i = 0; i < 2; i++)
         {
             cout << "Enter the name for player " << symbols[i] << ": ";
             string name;
             getline(cin, name);
-            players[i].setter(name, symbols[i]);
+            players[i].setPlayerDetails(name, symbols[i]);
         }
-        board.initializeBoard();
-    }
-
-    ~Game()
-    {
+        board.initialize();
     }
 
     void play()
@@ -172,17 +185,18 @@ public:
         bool gameWon = false;
         while (!board.isFull() && !gameWon)
         {
-            board.displayBoard();
+            board.display();
             Player &player = players[currentPlayer];
             cout << player.getName() << "'s turn (" << player.getSymbol() << ")\n";
             int row, col;
             cout << "Enter row and column: ";
             cin >> row >> col;
+
             if (board.makeMove(row, col, player.getSymbol()))
             {
                 if (board.checkWin(player.getSymbol()))
                 {
-                    board.displayBoard();
+                    board.display();
                     cout << "Congratulations! " << player.getName() << " wins the game!\n";
                     gameWon = true;
                 }
@@ -196,7 +210,7 @@ public:
 
         if (!gameWon)
         {
-            board.displayBoard();
+            board.display();
             cout << "It's a draw!\n";
         }
     }
