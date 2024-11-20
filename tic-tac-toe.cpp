@@ -58,19 +58,24 @@ public:
 
 int Player::playerCount = 0;
 
-// Class to manage Board (Handles initialization, display, and moves of the board)
+// Abstract Base Class to represent the Board (Supports OCP for different types of boards)
 class Board
 {
 protected:
-    char board[3][3];
+    char board[3][3]; // Default size for simplicity, can be extended
 
 public:
-    Board()
-    {
-        initialize();
-    }
+    virtual void initialize() = 0;
+    virtual void display() const = 0;
+    virtual bool makeMove(int row, int col, char playerSymbol) = 0;
+    virtual bool makeMove(int position, char playerSymbol) = 0;
+    virtual bool isFull() const = 0;
+};
 
-    void initialize()
+class TicTacToeBoard : public Board
+{
+public:
+    void initialize() override
     {
         for (int i = 0; i < 3; i++)
         {
@@ -81,7 +86,7 @@ public:
         }
     }
 
-    void display() const
+    void display() const override
     {
         cout << "  0 1 2\n";
         for (int i = 0; i < 3; i++)
@@ -99,7 +104,7 @@ public:
         }
     }
 
-    bool makeMove(int row, int col, char playerSymbol)
+    bool makeMove(int row, int col, char playerSymbol) override
     {
         if (row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == ' ')
         {
@@ -109,14 +114,14 @@ public:
         return false;
     }
 
-    bool makeMove(int position, char playerSymbol)
+    bool makeMove(int position, char playerSymbol) override
     {
         int row = position / 3;
         int col = position % 3;
         return makeMove(row, col, playerSymbol);
     }
 
-    bool isFull() const
+    bool isFull() const override
     {
         for (int i = 0; i < 3; i++)
         {
@@ -131,7 +136,7 @@ public:
 };
 
 // Class to check the win conditions for the game
-class TicTacToeBoard : public Board
+class TicTacToeGame : public TicTacToeBoard
 {
 public:
     bool checkWin(char playerSymbol) const
@@ -160,7 +165,7 @@ class Game
 {
 private:
     Player players[2];
-    TicTacToeBoard board;
+    Board *board; // Polymorphism: board can be any derived class of Board
     int currentPlayer;
 
 public:
@@ -174,15 +179,21 @@ public:
             getline(cin, name);
             players[i].setPlayerDetails(name, symbols[i]);
         }
-        board.initialize();
+        board = new TicTacToeBoard(); // Initialize with a TicTacToeBoard, but can be extended to other types.
+        board->initialize();
+    }
+
+    ~Game()
+    {
+        delete board;
     }
 
     void play()
     {
         bool gameWon = false;
-        while (!board.isFull() && !gameWon)
+        while (!board->isFull() && !gameWon)
         {
-            board.display();
+            board->display();
             Player &player = players[currentPlayer];
             cout << player.getName() << "'s turn (" << player.getSymbol() << ")\n";
             int choice;
@@ -194,11 +205,11 @@ public:
             {
                 cout << "Enter row and column: ";
                 cin >> row >> col;
-                if (board.makeMove(row, col, player.getSymbol()))
+                if (board->makeMove(row, col, player.getSymbol()))
                 {
-                    if (board.checkWin(player.getSymbol()))
+                    if (dynamic_cast<TicTacToeGame *>(board)->checkWin(player.getSymbol()))
                     {
-                        board.display();
+                        board->display();
                         cout << "Congratulations! " << player.getName() << " wins the game!\n";
                         gameWon = true;
                     }
@@ -213,11 +224,11 @@ public:
             {
                 cout << "Enter position (0-8): ";
                 cin >> pos;
-                if (board.makeMove(pos, player.getSymbol()))
+                if (board->makeMove(pos, player.getSymbol()))
                 {
-                    if (board.checkWin(player.getSymbol()))
+                    if (dynamic_cast<TicTacToeGame *>(board)->checkWin(player.getSymbol()))
                     {
-                        board.display();
+                        board->display();
                         cout << "Congratulations! " << player.getName() << " wins the game!\n";
                         gameWon = true;
                     }
@@ -232,7 +243,7 @@ public:
 
         if (!gameWon)
         {
-            board.display();
+            board->display();
             cout << "It's a draw!\n";
         }
     }
