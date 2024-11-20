@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 
-// Abstract Base Class: Person
+// Class to manage player's information - Name (Single Responsibility)
 class Person
 {
 protected:
@@ -10,7 +10,6 @@ protected:
 public:
     Person() : name("Unknown") {}
 
-    // Set and Get methods for 'name'
     void setName(const string &playerName)
     {
         name = playerName;
@@ -22,7 +21,7 @@ public:
     }
 };
 
-// Derived Class: Player inherits from Person (Single Inheritance)
+// Class to represent Player (Handles player's symbol, count, etc.)
 class Player : public Person
 {
 private:
@@ -40,10 +39,9 @@ public:
         playerCount--;
     }
 
-    // Sets player's details with name and symbol
     void setPlayerDetails(const string &playerName, char playerSymbol)
     {
-        setName(playerName); // Set the name using the Person base class function
+        setName(playerName);
         symbol = playerSymbol;
     }
 
@@ -52,7 +50,6 @@ public:
         return symbol;
     }
 
-    // Static function to get player count
     static int getPlayerCount()
     {
         return playerCount;
@@ -61,30 +58,19 @@ public:
 
 int Player::playerCount = 0;
 
-// Abstract Base Class: GameComponent for multilevel inheritance
-class GameComponent
-{
-public:
-    // Pure virtual functions - Making GameComponent an abstract class
-    virtual void initialize() = 0;    // For initialization
-    virtual void display() const = 0; // For displaying game components
-};
-
-// Derived Class: Board inherits from GameComponent (Multilevel Inheritance)
-class Board : public GameComponent
+// Class to manage Board (Handles initialization, display, and moves of the board)
+class Board
 {
 protected:
-    char board[3][3]; // 3x3 board array
+    char board[3][3];
 
 public:
-    // Constructor initializes the board
     Board()
     {
         initialize();
     }
 
-    // Initializes board with empty spaces
-    void initialize() override
+    void initialize()
     {
         for (int i = 0; i < 3; i++)
         {
@@ -95,8 +81,7 @@ public:
         }
     }
 
-    // Displays the Tic-Tac-Toe board
-    void display() const override
+    void display() const
     {
         cout << "  0 1 2\n";
         for (int i = 0; i < 3; i++)
@@ -114,7 +99,6 @@ public:
         }
     }
 
-    // Overloaded makeMove function: Allows move by row and column
     bool makeMove(int row, int col, char playerSymbol)
     {
         if (row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == ' ')
@@ -125,7 +109,6 @@ public:
         return false;
     }
 
-    // Overloaded makeMove function: Allows move by single position
     bool makeMove(int position, char playerSymbol)
     {
         int row = position / 3;
@@ -133,7 +116,6 @@ public:
         return makeMove(row, col, playerSymbol);
     }
 
-    // Checks if the board is full
     bool isFull() const
     {
         for (int i = 0; i < 3; i++)
@@ -148,14 +130,12 @@ public:
     }
 };
 
-// Derived Class: TicTacToeBoard inherits from Board (Multilevel Inheritance)
+// Class to check the win conditions for the game
 class TicTacToeBoard : public Board
 {
 public:
-    // Checks if a player has won
     bool checkWin(char playerSymbol) const
     {
-        // Check rows and columns
         for (int i = 0; i < 3; i++)
         {
             if ((board[i][0] == playerSymbol && board[i][1] == playerSymbol && board[i][2] == playerSymbol) ||
@@ -165,7 +145,6 @@ public:
             }
         }
 
-        // Check diagonals
         if ((board[0][0] == playerSymbol && board[1][1] == playerSymbol && board[2][2] == playerSymbol) ||
             (board[0][2] == playerSymbol && board[1][1] == playerSymbol && board[2][0] == playerSymbol))
         {
@@ -176,7 +155,7 @@ public:
     }
 };
 
-// Game Class to control the game flow
+// Game class to control the flow of the game (Manages the game loop and player turns)
 class Game
 {
 private:
@@ -187,7 +166,6 @@ private:
 public:
     Game() : currentPlayer(0)
     {
-        // Initialize player symbols
         char symbols[] = {'X', 'O'};
         for (int i = 0; i < 2; i++)
         {
@@ -196,10 +174,9 @@ public:
             getline(cin, name);
             players[i].setPlayerDetails(name, symbols[i]);
         }
-        board.initialize(); // Initialize the board
+        board.initialize();
     }
 
-    // Main game loop
     void play()
     {
         bool gameWon = false;
@@ -213,7 +190,6 @@ public:
             cin >> choice;
             int row, col, pos;
 
-            // Choose input method for the move
             if (choice == 1)
             {
                 cout << "Enter row and column: ";
@@ -254,7 +230,6 @@ public:
             }
         }
 
-        // Check for draw if board is full
         if (!gameWon)
         {
             board.display();
