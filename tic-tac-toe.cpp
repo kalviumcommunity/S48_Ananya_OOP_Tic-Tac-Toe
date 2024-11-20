@@ -70,6 +70,7 @@ public:
     virtual bool makeMove(int row, int col, char playerSymbol) = 0;
     virtual bool makeMove(int position, char playerSymbol) = 0;
     virtual bool isFull() const = 0;
+    virtual bool checkWin(char playerSymbol) const = 0; // Added this method to check for wins
 };
 
 class TicTacToeBoard : public Board
@@ -133,13 +134,8 @@ public:
         }
         return true;
     }
-};
 
-// Class to check the win conditions for the game
-class TicTacToeGame : public TicTacToeBoard
-{
-public:
-    bool checkWin(char playerSymbol) const
+    bool checkWin(char playerSymbol) const override
     {
         for (int i = 0; i < 3; i++)
         {
@@ -207,7 +203,7 @@ public:
                 cin >> row >> col;
                 if (board->makeMove(row, col, player.getSymbol()))
                 {
-                    if (dynamic_cast<TicTacToeGame *>(board)->checkWin(player.getSymbol()))
+                    if (board->checkWin(player.getSymbol())) // LSP ensures TicTacToeBoard correctly implements checkWin
                     {
                         board->display();
                         cout << "Congratulations! " << player.getName() << " wins the game!\n";
@@ -226,7 +222,7 @@ public:
                 cin >> pos;
                 if (board->makeMove(pos, player.getSymbol()))
                 {
-                    if (dynamic_cast<TicTacToeGame *>(board)->checkWin(player.getSymbol()))
+                    if (board->checkWin(player.getSymbol())) // LSP ensures TicTacToeBoard correctly implements checkWin
                     {
                         board->display();
                         cout << "Congratulations! " << player.getName() << " wins the game!\n";
